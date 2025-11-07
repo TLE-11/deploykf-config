@@ -13,18 +13,6 @@ true
 {{<- end ->}}
 
 ##
-## If the object store is AWS S3.
-## - NOTE: empty means false, non-empty means true
-##
-{{<- define "kubeflow_pipelines.object_store.is_aws_s3" ->}}
-{{<- if not (tmpl.Exec "kubeflow_pipelines.use_embedded_minio" .) ->}}
-{{<- if .Values.kubeflow_tools.pipelines.objectStore.host | regexp.Match `^.*s3.*amazonaws.com.*$` ->}}
-true
-{{<- end ->}}
-{{<- end ->}}
-{{<- end ->}}
-
-##
 ## The HOSTNAME of the object store api.
 ##
 {{<- define "kubeflow_pipelines.object_store.hostname" ->}}
@@ -42,11 +30,7 @@ deploykf-minio-api.{{< .Values.deploykf_opt.deploykf_minio.namespace >}}.svc.clu
 {{<- if tmpl.Exec "kubeflow_pipelines.use_embedded_minio" . ->}}
 9000
 {{<- else ->}}
-{{<- if and (tmpl.Exec "kubeflow_pipelines.object_store.is_aws_s3" .) (.Values.kubeflow_tools.pipelines.objectStore.port) ->}}
-{{< fail "`kubeflow_tools.pipelines.objectStore.port` must be empty if using AWS S3" >}}
-{{<- else ->}}
 {{< .Values.kubeflow_tools.pipelines.objectStore.port | default "" >}}
-{{<- end ->}}
 {{<- end ->}}
 {{<- end ->}}
 
@@ -66,22 +50,18 @@ deploykf-minio-api.{{< .Values.deploykf_opt.deploykf_minio.namespace >}}.svc.clu
 {{<- end ->}}
 
 ##
-## If SSL/HTTPS will be used for the object store api.
-## - NOTE: false is represented as 'false', true is represented as 'true'
-##         remember to `... | conv.ToBool` if you need a boolean value
+## If SSL/HTTPS WILL be used for the object store api.
 ##
 {{<- define "kubeflow_pipelines.object_store.use_ssl" ->}}
 {{<- if tmpl.Exec "kubeflow_pipelines.use_embedded_minio" . ->}}
 false
 {{<- else ->}}
-{{< .Values.kubeflow_tools.pipelines.objectStore.useSSL | conv.ToBool >}}
+{{< .Values.kubeflow_tools.pipelines.objectStore.useSSL >}}
 {{<- end ->}}
 {{<- end ->}}
 
 ##
 ## If SSL/HTTPS WILL NOT be used for the object store api
-## - NOTE: false is represented as 'false', true is represented as 'true'
-##         remember to `... | conv.ToBool` if you need a boolean value
 ##
 {{<- define "kubeflow_pipelines.object_store.not_use_ssl" ->}}
 {{<- if eq (tmpl.Exec "kubeflow_pipelines.object_store.use_ssl" . | conv.ToString | toLower) "true" ->}}
@@ -90,18 +70,7 @@ false
 true
 {{<- else ->}}
 {{< fail "invalid `kubeflow_tools.pipelines.objectStore.useSSL`, must be 'true' or 'false'" >}}
-{{<- end ->}}
-{{<- end ->}}
-
-##
-## The ENDPOINT_URL (schema, hostname, and port) of the object store api.
-##
-{{<- define "kubeflow_pipelines.object_store.endpoint_url" ->}}
-{{<- if (tmpl.Exec "kubeflow_pipelines.object_store.use_ssl" .) | conv.ToBool ->}}
-https://{{< tmpl.Exec "kubeflow_pipelines.object_store.endpoint" . >}}
-{{<- else ->}}
-http://{{< tmpl.Exec "kubeflow_pipelines.object_store.endpoint" . >}}
-{{<- end ->}}
+{{<- end >}}
 {{<- end ->}}
 
 ##
@@ -211,21 +180,33 @@ secret_key
 ## - NOTE: this value is used regardless of the "source" secret name, and is shared across all profiles
 ##
 {{<- define "kubeflow_pipelines.object_store.profile.cloned_secret_name" ->}}
+{{<- if .Values.kubeflow_tools.pipelines.kfpV2.minioFix ->}}
+mlpipeline-minio-artifact
+{{<- else ->}}
 cloned--pipelines-object-store-auth
+{{<- end ->}}
 {{<- end ->}}
 
 ##
 ## The KEY containing the object store ACCESS_KEY in the GENERATED Kubernetes Secrets (in profile namespaces).
 ##
 {{<- define "kubeflow_pipelines.object_store.profile.generated_access_key_key" ->}}
+{{<- if .Values.kubeflow_tools.pipelines.kfpV2.minioFix ->}}
+accesskey
+{{<- else ->}}
 {{< .Values.deploykf_core.deploykf_profiles_generator.profileDefaults.tools.kubeflowPipelines.objectStoreAuth.existingSecretAccessKeyKey >}}
+{{<- end ->}}
 {{<- end ->}}
 
 ##
 ## The KEY containing the object store SECRET_KEY in the GENERATED Kubernetes Secrets (in profile namespaces).
 ##
 {{<- define "kubeflow_pipelines.object_store.profile.generated_secret_key_key" ->}}
+{{<- if .Values.kubeflow_tools.pipelines.kfpV2.minioFix ->}}
+secretkey
+{{<- else ->}}
 {{< .Values.deploykf_core.deploykf_profiles_generator.profileDefaults.tools.kubeflowPipelines.objectStoreAuth.existingSecretSecretKeyKey >}}
+{{<- end ->}}
 {{<- end ->}}
 
 ##

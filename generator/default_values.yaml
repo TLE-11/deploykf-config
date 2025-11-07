@@ -110,13 +110,13 @@ deploykf_dependencies:
     charts:
       certManager:
         name: cert-manager
-        version: 1.12.10
+        version: 1.12.2
         repository: https://charts.jetstack.io
 
       trustManager:
         name: trust-manager
         ## NOTE: we fork the upstream trust-manager chart to fix race conditions with cert-manager
-        version: 0.9.2-deploykf
+        version: 0.5.0-deploykf
         repository: file://forks/trust-manager
 
     ## image overrides
@@ -234,13 +234,13 @@ deploykf_dependencies:
       istioBase:
         name: base
         ## NOTE: this version should be aligned with `deploykf_core.deploykf_istio_gateway.charts.istioGateway.version`
-        version: 1.17.8
+        version: 1.17.3
         repository: https://istio-release.storage.googleapis.com/charts
 
       istioDaemon:
         name: istiod
         ## NOTE: this version should be aligned with `deploykf_core.deploykf_istio_gateway.charts.istioGateway.version`
-        version: 1.17.8
+        version: 1.17.3
         repository: https://istio-release.storage.googleapis.com/charts
 
     ## image overrides
@@ -449,17 +449,17 @@ deploykf_core:
     images:
       dex:
         repository: ghcr.io/dexidp/dex
-        tag: v2.39.1
+        tag: v2.37.0
         pullPolicy: IfNotPresent
 
       oauth2Proxy:
         repository: quay.io/oauth2-proxy/oauth2-proxy
-        tag: v7.6.0
+        tag: v7.5.1
         pullPolicy: IfNotPresent
 
       kubectl:
         repository: docker.io/bitnami/kubectl
-        tag: 1.26.15-debian-12-r4
+        tag: 1.26.6-debian-11-r8
         pullPolicy: IfNotPresent
 
     ## dex configs
@@ -625,17 +625,17 @@ deploykf_core:
     images:
       dashboard:
         repository: ghcr.io/deploykf/dashboard
-        tag: 0.1.1
+        tag: 0.1.0
         pullPolicy: IfNotPresent
 
       profileController:
         repository: kubeflownotebookswg/profile-controller
-        tag: v1.8.0
+        tag: v1.7.0
         pullPolicy: IfNotPresent
 
       kfamApi:
         repository: kubeflownotebookswg/kfam
-        tag: v1.8.0
+        tag: v1.7.0
         pullPolicy: IfNotPresent
 
     ## configs dashboard navigation
@@ -696,7 +696,7 @@ deploykf_core:
         enabled: true
         name: gateway
         ## NOTE: this version should be aligned with `deploykf_dependencies.istio.charts.istioDaemon.version`
-        version: 1.17.8
+        version: 1.17.3
         repository: https://istio-release.storage.googleapis.com/charts
 
     ## istio gateway configs
@@ -927,7 +927,7 @@ deploykf_core:
           ##        - a kubernetes secret named `existingSecret` must exist the namespace `existingSecretNamespace`
           ##          with the keys `existingSecretAccessKeyKey` and `existingSecretSecretKeyKey`
           ##        - this secret will be cloned into the profile's namespace and kept in sync with the original
-          ##        - note, all occurrences of "{profile_name}" in `existingSecret` are replaced with the profile name
+          ##        - note, all occurances of "{profile_name}" in `existingSecret` are replaced with the profile name
           ##        - note, the default value of `existingSecretNamespace` is the kubeflow-pipelines namespace
           ##  - when `kubeflow_tools.kubeflow_pipelines.objectStore.auth.fromEnv`:
           ##     - is false (default):
@@ -1039,28 +1039,18 @@ deploykf_opt:
     ##
     images:
       minio:
-        ## NOTE: we use the bitnami image because the upstream image does not contain `curl` and we
-        ##       need it to run checks before starting minio: https://github.com/minio/minio/issues/18373
-        repository: docker.io/bitnami/minio
-        tag: 2024.5.10-debian-12-r2
+        repository: docker.io/minio/minio
+        tag: RELEASE.2023-08-04T17-40-21Z
         pullPolicy: IfNotPresent
 
       minioMc:
-        ## NOTE: we copy `mc` to a volume for use in our init jobs. we use the bitnami image because `/usr/bin/mc`
-        ##       isn't readable by non-root in the official image: https://github.com/minio/mc/issues/4932
-        repository: docker.io/bitnami/minio-client
-        tag: 2024.5.9-debian-12-r0
+        repository: docker.io/minio/mc
+        tag: RELEASE.2023-08-01T23-30-57Z
         pullPolicy: IfNotPresent
 
       kubectl:
         repository: docker.io/bitnami/kubectl
-        tag: 1.26.15-debian-12-r4
-        pullPolicy: IfNotPresent
-
-      shell:
-        ## NOTE: this image must have `bash`, `curl` and `jq` installed
-        repository: docker.io/bitnami/os-shell
-        tag: 12-debian-12-r20
+        tag: 1.26.6-debian-11-r8
         pullPolicy: IfNotPresent
 
     ## persistence configs
@@ -1190,12 +1180,12 @@ deploykf_opt:
     images:
       mysql:
         repository: docker.io/mysql
-        tag: 8.0.37
+        tag: 8.0.33
         pullPolicy: IfNotPresent
 
       kubectl:
         repository: docker.io/bitnami/kubectl
-        tag: 1.26.15-debian-12-r4
+        tag: 1.26.6-debian-11-r8
         pullPolicy: IfNotPresent
 
     ## persistence configs
@@ -1288,7 +1278,6 @@ deploykf_opt:
       [mysqld]
       disable_log_bin
       default_authentication_plugin=mysql_native_password
-      log_error_suppression_list='MY-013360'
 
 
 ## --------------------------------------------------------------------------------
@@ -1489,15 +1478,15 @@ kubeflow_tools:
       ##
       image:
         ## the default container image
-        value: kubeflownotebookswg/jupyter-scipy:v1.8.0
+        value: kubeflownotebookswg/jupyter-scipy:v1.7.0
 
         ## the list of available container images in the dropdown
         options:
-          - kubeflownotebookswg/jupyter-scipy:v1.8.0
-          - kubeflownotebookswg/jupyter-pytorch-full:v1.8.0
-          - kubeflownotebookswg/jupyter-pytorch-cuda-full:v1.8.0
-          - kubeflownotebookswg/jupyter-tensorflow-full:v1.8.0
-          - kubeflownotebookswg/jupyter-tensorflow-cuda-full:v1.8.0
+          - kubeflownotebookswg/jupyter-scipy:v1.7.0
+          - kubeflownotebookswg/jupyter-pytorch-full:v1.7.0
+          - kubeflownotebookswg/jupyter-pytorch-cuda-full:v1.7.0
+          - kubeflownotebookswg/jupyter-tensorflow-full:v1.7.0
+          - kubeflownotebookswg/jupyter-tensorflow-cuda-full:v1.7.0
 
       ## VSCode-like Container Images (Group 1)
       ##  - the `imageGroupOne` section is used for "VSCode-like" apps that
@@ -1509,11 +1498,11 @@ kubeflow_tools:
       ##
       imageGroupOne:
         ## the default container image
-        value: kubeflownotebookswg/codeserver-python:v1.8.0
+        value: kubeflownotebookswg/codeserver-python:v1.7.0
 
         ## the list of available container images in the dropdown
         options:
-          - kubeflownotebookswg/codeserver-python:v1.8.0
+          - kubeflownotebookswg/codeserver-python:v1.7.0
 
       ## RStudio-like Container Images (Group 2)
       ##  - the `imageGroupTwo` section is used for "RStudio-like" apps whose
@@ -1527,11 +1516,11 @@ kubeflow_tools:
       ##
       imageGroupTwo:
         ## the default container image
-        value: kubeflownotebookswg/rstudio-tidyverse:v1.8.0
+        value: kubeflownotebookswg/rstudio-tidyverse:v1.7.0
 
         ## the list of available container images in the dropdown
         options:
-          - kubeflownotebookswg/rstudio-tidyverse:v1.8.0
+          - kubeflownotebookswg/rstudio-tidyverse:v1.7.0
 
       ## CPU Resources
       ##
@@ -1784,45 +1773,45 @@ kubeflow_tools:
     ##
     images:
       kfpCacheServer:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/cache-server
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/cache-server
+        tag: ~
 
       kfpMetadataEnvoy:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/metadata-envoy
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/metadata-envoy
+        tag: ~
 
       kfpMetadataWriter:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/metadata-writer
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/metadata-writer
+        tag: ~
 
       kfpApiServer:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/api-server
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/api-server
+        tag: ~
 
       kfpPersistenceagent:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/persistenceagent
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/persistenceagent
+        tag: ~
 
       kfpScheduledworkflow:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/scheduledworkflow
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/scheduledworkflow
+        tag: ~
 
       kfpFrontend:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/frontend
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/frontend
+        tag: ~
 
       kfpViewerCrdController:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/viewer-crd-controller
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/viewer-crd-controller
+        tag: ~
 
       kfpVisualizationServer:
-        repository: ghcr.io/deploykf/kubeflow-pipelines/visualization-server
-        tag: 2.1.0-deploykf.0
+        repository: gcr.io/ml-pipeline/visualization-server
+        tag: ~
 
       tfxMlMetadataStoreServer:
-        repository: ghcr.io/deploykf/ml_metadata_store_server
+        repository: gcr.io/tfx-oss-public/ml_metadata_store_server
         ## NOTE: this tag is not aligned to the other KFP images
-        tag: 1.14.0-deploykf.0
+        tag: ~
 
     ## service account configs
     ##
@@ -1911,31 +1900,32 @@ kubeflow_tools:
     kfpV2:
 
       ## sets the default `pipeline_root` in each profile
+      ##  - https://www.kubeflow.org/docs/components/pipelines/v1/overview/pipeline-root/
       ##  - if `kubeflow_tools.pipelines.objectStore.useExternal` is false, then this must be left as the default
       ##  - the following template variables are available:
-      ##     - `{scheme}`: "s3" if the object store host is AWS S3, otherwise "minio"
-      ##     - `{bucket_name}`: the name of the bucket, value of `kubeflow_tools.pipelines.bucket.name`
-      ##     - `{bucket_region}`: the region of the bucket, value of `kubeflow_tools.pipelines.bucket.region`
-      ##                          (if empty, defaults the literal string: "unspecified")
-      ##     - `{endpoint}`: the endpoint of the object store, in the format "{host}:{port}"
-      ##     - `{not_use_ssl}`: "false" if `kubeflow_tools.pipelines.objectStore.useSSL` is true, "true" otherwise
+      ##     - `{bucket_name}`: the name of the bucket (see `kubeflow_tools.pipelines.bucket.name`)
       ##     - `{profile_name}`: the name of the profile
       ##
-      defaultPipelineRoot: "{scheme}://{bucket_name}/v2/artifacts/{profile_name}?region={bucket_region}&endpoint={endpoint}&disableSSL={not_use_ssl}&s3ForcePathStyle=true"
+      defaultPipelineRoot: "minio://{bucket_name}/v2/artifacts/{profile_name}"
 
-      ## sets the "driver" image used in v2 workflows
+      ## apply fixes to make MinIO work with KFP v2
+      ##  - these fixes are needed because KFP v2 uses hard-coded configs for MinIO
+      ##    https://github.com/kubeflow/pipelines/issues/9689
+      ##  - if true:
+      ##     - the name of all cloned object store auth secrets in profiles becomes "mlpipeline-minio-artifact"
+      ##     - the key names used in generated minio auth secrets becomes "accesskey" and "secretkey"
+      ##     - the 'kfp-launcher' containers in workflow pods are patched at runtime to set:
+      ##        - `MINIO_SERVICE_SERVICE_HOST` and `MINIO_SERVICE_SERVICE_PORT`
+      ##        - `ML_PIPELINE_SERVICE_HOST` and `ML_PIPELINE_SERVICE_PORT_GRPC`
+      ##     - the value of `kubeflow_tools.pipelines.objectStore.useExternal` must be false
       ##
-      driverImage: "ghcr.io/deploykf/kubeflow-pipelines/kfp-driver:2.1.0-deploykf.0"
+      minioFix: false
 
-      ## sets the "launcher" image used in v2 workflows
-      ##
-      launcherImage: "ghcr.io/deploykf/kubeflow-pipelines/kfp-launcher:2.1.0-deploykf.0"
-
-      ## sets the "launcher" image used in v2-compatible workflows
+      ## overrides the image of 'kfp-launcher' containers at runtime
       ##  - this is useful because pipelines compiled with v2-compatible mode use a hard-coded image
       ##    https://github.com/kubeflow/pipelines/blob/1.8.22/sdk/python/kfp/compiler/v2_compat.py#L25
       ##
-      v2CompatibleLauncherImage: "ghcr.io/deploykf/kubeflow-pipelines/kfp-launcher:1.8.22-deploykf.0"
+      launcherImage: ""
 
     ## pipeline cache configs
     ##  - note, you can effectively disable caching (for KFP v1 mode) by setting both

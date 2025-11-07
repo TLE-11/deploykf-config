@@ -111,13 +111,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: pipeline-install-config
-                  ## NOTE: we use hostname only, KFP doesn't allow ports in the s3 endpoint config
-                  key: bucketHost
-            - name: AWS_SSL
-              valueFrom:
-                configMapKeyRef:
-                  name: pipeline-install-config
-                  key: bucketSecure
+                  key: bucketEndpoint
             - name: AWS_ACCESS_KEY_ID
               {{<- if .Values.kubeflow_tools.pipelines.objectStore.auth.fromEnv >}}
               value: ""
