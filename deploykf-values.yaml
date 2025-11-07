@@ -1,0 +1,25 @@
+# deploykf-values.yaml  --- 最小化开启 Kubeflow Pipelines & Dashboard
+deploykf:
+  ## 平台入口
+  gateway:
+    hostname: ""
+    tls:
+      enabled: false
+
+  ## 组件开关
+  kubeflow:
+    pipelines:
+      enabled: true
+    notebooks:
+      enabled: true
+    central_dashboard:
+      enabled: true
+
+  ## 认证：首次登录用静态账号
+  auth:
+    static:
+      enabled: true
+      users:
+        - email: admin@example.com
+          password: $2y$10$92bBqJYqSDXaVRVnmuh/dOEoKp2lQDJCXYq6Cvmn6M3oGa8xSuWGO   # 明文 123456
+          isAdmin: true
