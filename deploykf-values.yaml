@@ -23,3 +23,9 @@ deploykf:
         - email: admin@example.com
           password: $2y$10$92bBqJYqSDXaVRVnmuh/dOEoKp2lQDJCXYq6Cvmn6M3oGa8xSuWGO   # 明文 123456
           isAdmin: true
+
+  deploykf_dependencies:
+    istio:
+      pilot:
+        env:
+          PILOT_ENABLE_GATEWAY_API: "false"
